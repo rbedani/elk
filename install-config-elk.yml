@@ -1,0 +1,12 @@
+- name: Instalar Elasticsearch
+  hosts: master
+  become: true
+  vars:
+    ansible_become_password: "{{ ansible_ssh_pass }}"
+    elasticsearch_version: "8.7.1"
+  tasks:
+    - name: Configurar Elasticsearch
+      template:
+        src: templates/elasticsearch.conf.j2
+        dest: /usr/share/elasticsearch-{{ elasticsearch_version }}/config/elasticsearch.yml
+        mode: 0644

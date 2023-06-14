@@ -1,0 +1,16 @@
+- name: Delete All
+  hosts: master
+  become: true
+  vars:
+    ansible_become_password: "{{ ansible_ssh_pass }}"
+    elasticsearch_version: "8.7.1"
+    kibana_version: "8.7.1"
+  tasks:
+    - name: delete elasticsearch
+      file:
+        path: /usr/share/elasticsearch-{{ elasticsearch_version }}
+        state: absent
+    - name: delete kibana
+      file:
+        path: /usr/share/kibana-{{ kibana_version }}
+        state: absent

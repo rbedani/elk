@@ -1,0 +1,21 @@
+- name: Instalar Elasticsearch
+  hosts: master
+  become: true
+  vars:
+    ansible_become_password: "{{ ansible_ssh_pass }}"
+    version: "8.7.1"
+  tasks:
+    - name: Actualizar lista de paquetes
+      apt:
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+
+    - name: Instalar dependencias
+      apt:
+        name:
+          - openjdk-19-jdk-headless
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+      when: ansible_os_family == "Debian"

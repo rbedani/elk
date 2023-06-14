@@ -1,0 +1,147 @@
+- name: Instalar Elasticsearch y Kibana
+  hosts: master
+  become: true
+  vars:
+    ansible_become_password: "{{ ansible_ssh_pass }}"
+    elasticsearch_version: "8.7.1"
+    kibana_version: "8.7.1"
+  tasks:
+
+### PRE-Requisitos
+
+# JAVA
+# Curl
+# http-transport
+
+### Descargas Oficiales
+
+    - name: Descargar y desempaquetar Elasticsearch
+      unarchive:
+        src: "https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-{{ elasticsearch_version }}-linux-x86_64.tar.gz"
+        dest: /usr/share/
+        remote_src: yes
+        creates: "/usr/share/elasticsearch-{{ elasticsearch_version }}"
+
+    - name: Descargar y desempaquetar Kibana
+      unarchive:
+        src: "https://artifacts.elastic.co/downloads/kibana/kibana-{{ kibana_version }}-linux-x86_64.tar.gz"
+        dest: /usr/share/
+        remote_src: yes
+        creates: "/usr/share/kibana-{{ kibana_version }}"
+
+### Usuarios, Grupos y Permisos
+
+    - name: Crear grupo Elasticsearch
+      group:
+        name: elasticsearch
+        state: present
+        system: yes
+
+    - name: Crear usuario Elasticsearch
+      user:
+        name: elasticsearch
+        group: elasticsearch
+        shell: /bin/false
+        system: yes
+        createhome: no
+
+    - name: Crear usuario Kibana
+      user:
+        name: kibana
+        group: elasticsearch
+        shell: /bin/false
+        system: yes
+        createhome: no
+
+    - name: Establecer permisos recursivos en la carpeta de Elasticsearch
+      file:
+        path: /usr/share/elasticsearch-{{ elasticsearch_version }}
+        owner: elasticsearch
+        group: elasticsearch
+        recurse: yes
+        mode: "0777"
+        state: directory
+
+    - name: Establecer permisos recursivos en la carpeta de Kibana
+      file:
+        path: /usr/share/kibana-{{ kibana_version }}
+        owner: kibana
+        group: elasticsearch
+        recurse: yes
+        mode: "0777"
+        state: directory
+
+### Configuracion Elasticsearch
+
+    #xpack.security.enrollment.enabled: true
+    #xpack.security.http.ssl.keystore.path: /usr/share/elasticsearch-{{ elasticsearch_version }}/config/certificates/kibana.crt
+    #xpack.security.http.ssl.truststore.path: /usr/share/elasticsearch-{{ elasticsearch_version }}/config/certificates/kibana.crt
+    #xpack.security.http.ssl.truststore.password: "{{ ansible_become_password }}"
+    - name: Configurar Elasticsearch
+      template:
+        src: templates/elasticsearch.conf.j2
+        dest: /usr/share/elasticsearch-{{ elasticsearch_version }}/config/elasticsearch.yml
+        mode: 0644
+
+### Configuracion Kibana
+
+    #server.publicBaseUrl: "http://localhost"
+    #server.ssl.enabled: true
+    #server.ssl.certificate: /usr/share/elasticsearch-{{ elasticsearch_version }}/config/certificates/kibana.crt
+    #server.ssl.key: /usr/share/elasticsearch-{{ elasticsearch_version }}/config/certificates/kibana.key
+    #elasticsearch.ssl.certificateAuthorities: [ '/usr/share/elasticsearch-{{ elasticsearch_version }}/config/certificates/kibana.crt' ]
+    - name: Configurar Kibana
+      template:
+        src: templates/kibana.conf.j2
+        dest: /usr/share/kibana-{{ kibana_version }}/config/kibana.yml
+        mode: 0644
+
+### Certificados SSL/TLS
+
+#    - name: Generar certificado SSL
+#      openssl_privatekey:
+#        path: /etc/ssl/private/kibana.key
+#        size: 2048
+#        owner: root
+#        group: root
+#        mode: '0600'
+
+    - name: Generar certificado SSL
+      openssl_certificate:
+        path: /etc/ssl/certs/kibana.crt
+        privatekey_path: /etc/ssl/private/kibana.key
+        owner: root
+        group: root
+        mode: '0600'
+        subject:
+          common_name: "{{ ansible_fqdn }}"
+        provider: selfsigned
+
+    - name: Crear directorio certificates en Elasticsearch
+      file:
+        path: "/usr/share/elasticsearch-{{ elasticsearch_version }}/config/certificates"
+        state: directory
+        owner: elasticsearch
+        group: elasticsearch
+        mode: '0755'
+
+    - name: Copiar certificado SSL a Elasticsearch
+      copy:
+        src: /etc/ssl/certs/kibana.crt
+        dest: /usr/share/elasticsearch-{{ elasticsearch_version }}/config/certificates/kibana.crt
+        owner: elasticsearch
+        group: elasticsearch
+        mode: '0644'
+        remote_src: yes
+
+    - name: Copiar clave privada a Elasticsearch
+      copy:
+        src: /etc/ssl/private/kibana.key
+        dest: /usr/share/elasticsearch-{{ elasticsearch_version }}/config/certificates/kibana.key
+        owner: elasticsearch
+        group: elasticsearch
+        mode: '0600'
+        remote_src: yes
+
+### ProxyHTTP
+

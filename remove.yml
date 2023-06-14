@@ -1,0 +1,68 @@
+---
+- name: Remove Elasticsearch y Kibana
+  hosts: worker
+  become: yes
+
+  vars:
+    ansible_become_password: "{{ ansible_ssh_pass }}"
+
+  tasks:
+#    - name: Remover clave pública de Elasticsearch
+#      apt_key:
+#        url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+#        state: absent
+#      when: ansible_os_family == "Debian"
+
+#    - name: Remover dependencias de Elasticsearch y Kibana
+#      apt:
+#        name:
+#          - openjdk-8-jdk
+#          - apt-transport-https
+#          - ca-certificates
+#          - curl
+#          - software-properties-common
+#        state: absent
+#      when: ansible_os_family == "Debian"
+
+    - name: Remover el repositorio de Elasticsearch
+      apt_repository:
+        repo: deb https://artifacts.elastic.co/packages/8.x/apt stable main
+        state: absent
+        filename: elastic-8.x
+      when: ansible_os_family == "Debian"
+
+#    - name: Actualizar lista de paquetes
+#      apt:
+#        update_cache: yes
+#      when: ansible_os_family == "Debian"
+
+    - name: Remover Elasticsearch +`Kibana
+      apt:
+        name:
+          - elasticsearch
+          - kibana
+        state: absent
+      when: ansible_os_family == "Debian"
+
+    - name: Remover Configuración Elasticsearch
+      file:
+        path: /etc/elasticsearch/elasticsearch.yml
+        state: absent
+
+    - name: Remover Configurar Kibana
+      file:
+        path: /etc/kibana/kibana.yml
+        state: absent
+
+#    - name: Reboot hosts
+#      shell: reboot
+#      async: 1
+#      poll: 0
+
+#    - name: Waiting host again up
+#      wait_for_connection:
+#        timeout: 300
+
+#    - name: Notification host ready up
+#      debug:
+#        msg: "El servidor está en línea."

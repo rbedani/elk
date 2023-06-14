@@ -1,0 +1,41 @@
+- name: Instalar ProxyHTTP
+  hosts: master
+  become: true
+  vars:
+    ansible_become_password: "{{ ansible_ssh_pass }}"
+  tasks:
+    - name: Actualizar lista de paquetes
+      apt:
+        update_cache: yes
+
+    - name: Instalar dependencias de Kibana
+      apt:
+        name: nginx
+        state: present
+
+    - name: Configurar Nginx para Kibana
+      template:
+        src: templates/nginx_kibana.conf.j2
+        dest: /etc/nginx/sites-available/kibana.conf
+        mode: 0644
+      notify:
+        - Reiniciar Nginx
+
+    - name: Habilitar configuración de Kibana en Nginx
+      file:
+        src: /etc/nginx/sites-available/kibana.conf
+        dest: /etc/nginx/sites-enabled/kibana.conf
+        state: link
+
+    - name: Deshabilitar configuración de Nginx por defecto
+      file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+      notify:
+        - Reiniciar Nginx
+
+  handlers:
+    - name: Reiniciar Nginx
+      service:
+        name: nginx
+        state: restarted

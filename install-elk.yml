@@ -1,0 +1,13 @@
+- name: Instalar Elasticsearch
+  hosts: master
+  become: true
+  vars:
+    ansible_become_password: "{{ ansible_ssh_pass }}"
+    elasticsearch_version: "8.7.1"
+  tasks:
+    - name: Descargar y desempaquetar Elasticsearch
+      unarchive:
+        src: "https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-{{ elasticsearch_version }}-linux-x86_64.tar.gz"
+        dest: /usr/share/
+        remote_src: yes
+        creates: "/usr/share/elasticsearch-{{ elasticsearch_version }}"

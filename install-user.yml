@@ -1,0 +1,39 @@
+- name: Usuarios, grupos y permisos
+  hosts: master
+  become: true
+  vars:
+    ansible_become_password: "{{ ansible_ssh_pass }}"
+    elasticsearch_version: "8.7.1"
+    kibana_version: "8.7.1"
+  tasks:
+    - name: Crear grupo Elasticsearch
+      group:
+        name: elasticsearch
+        state: present
+        system: yes
+
+    - name: Crear usuario Elasticsearch
+      user:
+        name: elasticsearch
+        group: elasticsearch
+        shell: /bin/false
+        system: yes
+        createhome: no
+
+    - name: Establecer permisos recursivos en la carpeta de Elasticsearch
+      file:
+        path: /usr/share/elasticsearch-{{ elasticsearch_version }}
+        owner: elasticsearch
+        group: elasticsearch
+        recurse: yes
+        mode: "0777"
+        state: directory
+
+    - name: Establecer permisos recursivos en la carpeta de Kibana
+      file:
+        path: /usr/share/kibana-{{ kibana_version }}
+        owner: elasticsearch
+        group: elasticsearch
+        recurse: yes
+        mode: "0777"
+        state: directory

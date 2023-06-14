@@ -1,0 +1,33 @@
+---
+- name: Reload
+  hosts: master
+  become: yes
+
+  vars:
+    ansible_become_password: "{{ ansible_ssh_pass }}"
+
+  tasks:
+  #  - name: Reload Config Elasticsearch
+  #    copy:
+  #      src: files/elasticsearch.yml
+  #      dest: /etc/elasticsearch/elasticsearch.yml
+  #    notify:
+  #      - Reiniciar Elasticsearch
+
+  #  - name: Reload Config Kibana
+  #    copy:
+  #      src: files/kibana.yml
+  #      dest: /etc/kibana/kibana.yml
+  #    notify:
+  #      - Reiniciar Kibana
+
+  #handlers:
+    - name: Reiniciar Elasticsearch
+      systemd:
+        name: elasticsearch
+        state: restarted
+
+#    - name: Reiniciar Kibana
+#      systemd:
+#        name: kibana
+#        state: restarted

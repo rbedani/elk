@@ -1,0 +1,230 @@
+---
+- name: Instalar ELK
+  hosts: master
+  become: yes
+
+  vars:
+    ansible_become_password: "{{ ansible_ssh_pass }}"
+
+    elasticsearch_host: localhost
+    elasticsearch_port: 9200
+    elasticsearch_user: admin
+    elasticsearch_password: mysecretpassword
+
+  tasks:
+
+### REPOSITORIOS OFICIALES 
+
+    - name: Agregar el repositorio de Elasticsearch
+      yum_repository:
+        name: elastic-8.x
+        description: Elasticsearch repository for 8.x packages
+        baseurl: https://artifacts.elastic.co/packages/8.x/yum
+        gpgcheck: no
+        enabled: yes
+      when: ansible_os_family == "RedHat"
+
+### PRE-REQUISITOS
+
+    - name: Actualizar lista de paquetes
+      yum:
+        name: '*'
+        state: latest
+        update_cache: yes
+      when: ansible_os_family == "RedHat"
+
+    - name: Instalar dependencias
+      yum:
+        name:
+          - java-11-openjdk-devel
+          - python3-pip
+        state: present
+      when: ansible_os_family == "RedHat"
+
+### INSTALACION ELS + KIBANA + LOGSTASH
+
+    - name: Instalar Elasticsearch + Kibana + Logstash
+      yum:
+        name:
+          - elasticsearch
+          - kibana
+#          - logstash
+        state: present
+      when: ansible_os_family == "RedHat"
+
+### CERTIFICADOS
+
+### IMPORTAR CONFIGURACION ELS
+
+    - name: Configurar Elasticsearch
+      template:
+        src: templates/elasticsearch.conf.j2
+        dest: /etc/elasticsearch/elasticsearch.yml
+        mode: 0660
+        group: elasticsearch
+
+### IMPORTAR CONFIGURACION KIBANA
+
+    - name: Configurar Kibana
+      template:
+        src: templates/kibana.conf.j2
+        dest: /etc/kibana/kibana.yml
+        mode: 0660
+        group: kibana
+
+### IMPORTAR CONFIGURACION LOGSTASH
+
+#    - name: Configurar Logstash
+#      template:
+#        src: templates/logstash.conf.j2
+#        dest: /etc/logstash/conf.d
+#        mode: 0666
+#        group: logstash
+
+### INICIAR ELS
+
+    - name: Iniciar Elasticsearch
+      service:
+        name: elasticsearch
+        state: restarted
+        enabled: yes
+
+### INICIAR KIBANA
+
+    - name: Iniciar Kibana
+      service:
+        name: kibana
+        state: restarted
+        enabled: yes
+
+### PROXY REVERSE NGINX HTTP
+
+    - name: Instalar Apache
+      yum:
+        name:
+          - httpd
+          - mod_ssl
+        state: present
+      when: ansible_os_family == "RedHat"
+
+    - name: Configurar Apache como proxy HTTP para Kibana
+      template:
+        src: templates/proxyhttpd.conf.j2
+        dest: /etc/httpd/conf.d/kibana.conf
+        mode: 0644
+      when: ansible_os_family == "RedHat"
+
+    - name: Habilitar tráfico HTTP en el firewall
+      firewalld:
+        service: http
+        permanent: true
+        state: enabled
+        immediate: true
+      when: ansible_os_family == "RedHat"
+
+    - name: Configurar permisos de SELinux
+      seboolean:
+        name: httpd_can_network_connect
+        state: yes
+        persistent: true
+      when: ansible_os_family == "RedHat"
+
+    - name: Reiniciar Apache
+      service:
+        name: httpd
+        state: restarted
+        enabled: yes
+
+### ENROLLMENT KIBANA
+
+    - name: Nuevo token para Kibana
+      shell: /usr/share/elasticsearch/bin/elasticsearch-create-enrollment-token -s kibana
+      register: kibana_token
+    - set_fact:
+        new_token: "{{ kibana_token.stdout_lines[-1] | regex_replace('^.*: ', '') }}"
+    - debug:
+        var: new_token
+
+### KIBANA CODE VERIFICATION
+
+    - name: Codigo de verificacion Kibana
+      shell: /usr/share/kibana/bin/kibana-verification-code
+      register: kibana_code
+    - set_fact:
+        new_code: "{{ kibana_code.stdout_lines }}"
+    - debug:
+        var: kibana_code.stdout_lines
+
+### PASSWORD ELS
+
+#    - name: Password usuario elastic
+#      expect:
+#        command: /usr/share/elasticsearch/bin/elasticsearch-reset-password -u elastic
+#        responses:
+#          '.*?Please confirm that you would like to continue.*?': 'y'
+#      register: consola
+#    - set_fact:
+#        new_password_elastic: "{{ consola.stdout_lines[-1] | regex_replace('^.*: ', '') }}"
+#    - debug:
+#        var: new_password_elastic
+
+### PASSWORD KIBANA_SYSTEM
+
+#    - name: Password usuario kibana_system
+#      expect:
+#        command: /usr/share/elasticsearch/bin/elasticsearch-reset-password -u kibana_system
+#        responses:
+#          '.*?Please confirm that you would like to continue.*?': 'y'
+#      register: consola
+#    - set_fact:
+#        new_password_kibana_system: "{{ consola.stdout_lines[-1] | regex_replace('^.*: ', '') }}"
+#    - debug:
+#        var: new_password_kibana_system
+
+### VERIFICAR ELS
+
+#    - name: Test con usuario elastic
+#      register: elasticsearch_status
+#      shell: "curl --cacert /etc/elasticsearch/certs/http_ca.crt -u elastic:{{ new_password }} https://localhost:9200"
+#      args:
+#        warn: false
+#    - debug:
+#        var: elasticsearch_status.stdout_lines
+
+#    - name: Test con usuario kibana_system
+#      register: elasticsearch_status
+#      shell: "curl --cacert /etc/elasticsearch/certs/http_ca.crt -u kibana_system:{{ new_password }} https://localhost:9200"
+#      args:
+#        warn: false
+#    - debug:
+#        var: elasticsearch_status.stdout_lines
+
+### PASSWORD ADMIN
+
+    - name: Instalar módulo Elasticsearch
+      pip:
+        name: elasticsearch
+        state: present
+
+    - name: Agregar usuario administrador
+      block:
+        - name: Crear usuario
+          uri:
+            url: "http://{{ elasticsearch_host }}:{{ elasticsearch_port }}/_security/user/{{ elasticsearch_user }}"
+            method: PUT
+            body_format: json
+            body:
+              password: "{{ elasticsearch_password }}"
+              roles: ["superuser"]
+            body_content_type: application/json
+            headers:
+              Content-Type: application/json
+              Authorization: "Basic {{ ('{{ elasticsearch_user }}:' + '{{ elasticsearch_password }}') | b64encode }}"
+          register: result
+          until: result.status == 200 or result.status == 201
+          retries: 5
+          delay: 5
+      rescue:
+        - name: Imprimir error
+          debug:
+            var: result

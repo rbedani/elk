@@ -1,0 +1,14 @@
+- name: Instalar Kibana
+  hosts: master
+  become: true
+  vars:
+    ansible_become_password: "{{ ansible_ssh_pass }}"
+    kibana_version: "8.7.1"
+  tasks:
+    - name: Descargar y desempaquetar Kibana
+      unarchive:
+        src: "https://artifacts.elastic.co/downloads/kibana/kibana-{{ kibana_version }}-linux-x86_64.tar.gz"
+        dest: /usr/share/
+        remote_src: yes
+        creates: "/usr/share/kibana-{{ kibana_version }}"
+

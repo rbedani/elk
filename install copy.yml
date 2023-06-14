@@ -1,0 +1,188 @@
+---
+- name: Instalar Elasticsearch y Kibana
+  hosts: worker
+  become: yes
+
+  vars:
+    ansible_become_password: "{{ ansible_ssh_pass }}"
+
+  tasks:
+
+  ### REPOSITORIOS OFICIALES 
+
+    - name: Importar clave pública de Elasticsearch
+      apt_key:
+        url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+        state: present
+      when: ansible_os_family == "Debian"
+
+    - name: Agregar el repositorio de Elasticsearch
+      apt_repository:
+        repo: deb https://artifacts.elastic.co/packages/8.x/apt stable main
+        state: present
+        filename: elastic-8.x
+      when: ansible_os_family == "Debian"
+
+### PRE-REQUISITOS
+
+    - name: Actualizar lista de paquetes
+      apt:
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+
+    #- openjdk-19-jdk
+    - name: Instalar dependencias
+      apt:
+        name:
+          - default-jdk
+      when: ansible_os_family == "Debian"
+
+### INSTALACION ELS + KIBANA + LOGSTASH
+
+    - name: Instalar Elasticsearch + Kibana
+      apt:
+        name:
+         - elasticsearch
+         - kibana
+         - logstash
+      when: ansible_os_family == "Debian"
+
+### CERTIFICADOS
+
+### IMPORTAR CONFIGURACION ELS
+
+    - name: Configurar Elasticsearch
+      template:
+        src: templates/elasticsearch.conf.j2
+        dest: /etc/elasticsearch/elasticsearch.yml
+        mode: 0666
+        group: elasticsearch
+
+### IMPORTAR CONFIGURACION KIBANA
+
+### IMPORTAR CONFIGURACION LOGSTASH
+
+#    - name: Configurar Logstash
+#      template:
+#        src: templates/logstash.conf.j2
+#        dest: /etc/logstash/conf.d
+#        mode: 0666
+#        group: logstash
+
+### INICIAR ELS
+
+    - name: Iniciar Elasticsearch
+      service:
+        name: elasticsearch
+        state: started
+        enabled: yes
+      ignore_errors: true
+      register: start_result
+
+    - name: Mostrar error del Inicio de Elasticsearch
+      shell: cat /var/log/elasticsearch/elasticsearch.log
+      register: status_result
+      failed_when: start_result.failed
+    - debug:
+        msg: "{{ status_result.stdout }}"
+      when: status_result.failed
+
+### PASSWORD ELS
+
+    - name: Nueva password Elasticsearch
+      expect:
+        command: /usr/share/elasticsearch/bin/elasticsearch-reset-password -u elastic
+        responses:
+          '.*?Please confirm that you would like to continue.*?': 'y'
+      register: consola
+    - set_fact:
+        new_password: "{{ consola.stdout_lines[-1] | regex_replace('^.*: ', '') }}"
+    - debug:
+        var: new_password
+
+### VERIFICAR ELS
+
+    - name: Check Elasticsearch
+      register: elasticsearch_status
+      shell: "curl --cacert /etc/elasticsearch/certs/http_ca.crt -u elastic:{{ new_password }} https://localhost:9200"
+      args:
+        warn: false
+    - debug:
+        var: elasticsearch_status.stdout_lines
+
+### PROXY REVERSE NGINX HTTP
+
+#    - name: Instalar Nginx
+#      apt:
+#        name: nginx
+#        state: present
+
+#    - name: Importar Sites Kibana
+#      template:
+#        src: templates/nginx_kibana.conf.j2
+#        dest: /etc/nginx/sites-available/kibana.conf
+#        mode: 0644
+
+#    - name: Habilitar Sites Kibana
+#      file:
+#        src: /etc/nginx/sites-available/kibana.conf
+#        dest: /etc/nginx/sites-enabled/kibana.conf
+#        state: link
+
+#    - name: Deshabilitar configuración por defecto de Nginx
+#      file:
+#        path: /etc/nginx/sites-enabled/default
+#        state: absent
+
+#    - name: Reiniciar Nginx
+#      service:
+#        name: nginx
+#        state: restarted
+
+### ENROLLMENT KIBANA
+
+    - name: Nuevo token para Kibana
+      shell: /usr/share/elasticsearch/bin/elasticsearch-create-enrollment-token -s kibana
+      register: kibana_token
+    - set_fact:
+        new_token: "{{ kibana_token.stdout_lines }}"
+    - debug:
+        var: kibana_token.stdout_lines
+
+### IMPORTAR CONFIGURACION KIBANA
+
+    - name: Configurar Kibana
+      template:
+        src: templates/kibana.conf.j2
+        dest: /etc/kibana/kibana.yml
+        mode: 0666
+        group: kibana
+
+### INICIAR KIBANA
+
+    - name: Iniciar Kibana
+      service:
+        name: kibana
+        state: started
+        enabled: yes
+      ignore_errors: true
+      register: start_result
+
+    - name: Mostrar error del inicio de Kibana
+      shell: cat /var/log/kibana/kibana.log
+      register: status_result
+      failed_when: start_result.failed
+    - debug:
+        msg: "{{ status_result.stdout }}"
+      when: status_result.failed
+
+### KIBANA CODE VERIFICATION
+
+#    - name: Codigo de verificacion Kibana
+#      shell: /usr/share/kibana/bin/kibana-verification-code
+#      register: kibana_code
+#    - set_fact:
+#        new_code: "{{ kibana_code.stdout_lines }}"
+#    - debug:
+#        var: kibana_code.stdout_lines
+

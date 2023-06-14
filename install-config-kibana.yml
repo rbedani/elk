@@ -1,0 +1,12 @@
+- name: Instalar Kibana
+  hosts: master
+  become: true
+  vars:
+    ansible_become_password: "{{ ansible_ssh_pass }}"
+    kibana_version: "8.7.1"
+  tasks:
+    - name: Configurar Kibana
+      template:
+        src: templates/kibana.conf.j2
+        dest: /usr/share/kibana-{{ kibana_version }}/config/kibana.yml
+        mode: 0644
