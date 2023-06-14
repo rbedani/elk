@@ -1,6 +1,6 @@
-Despliegue automático de la pila elasticsearch
+Despliegue automático de la pila Elasticsearch
 ---
-Automatic deployment of the elasticsearch stack
+Automatic deployment of the Elasticsearch stack
 ---
 Rodrigo Daniel Bedani
 rbedani@flexxible.com
