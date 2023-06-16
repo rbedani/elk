@@ -1,0 +1,29 @@
+### VERIFICAR ELS
+
+    - name: Test con usuario elastic
+      register: elasticsearch_status
+      shell: "curl --cacert /etc/elasticsearch/certs/http_ca.crt -u elastic:{{ new_password }} https://localhost:9200"
+      args:
+        warn: false
+    - debug:
+        var: elasticsearch_status.stdout_lines
+
+    - name: Test con usuario kibana_system
+      register: elasticsearch_status
+      shell: "curl --cacert /etc/elasticsearch/certs/http_ca.crt -u kibana_system:{{ new_password }} https://localhost:9200"
+      args:
+        warn: false
+    - debug:
+        var: elasticsearch_status.stdout_lines
+
+### VERIFICAR LOGSTASH
+
+    - name: Validacion de LOGSTASH
+      register: logstash_status
+      become: yes
+      shell: sudo -u logstash /usr/share/logstash/bin/logstash --path.settings /etc/logstash -t
+      args:
+        warn: false
+    - debug:
+        var: logstash_status.stdout_lines
+      # Config Validation Result: OK. Exiting Logstash

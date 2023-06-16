@@ -2,14 +2,8 @@
 - name: Instalar ELK
   hosts: master
   become: yes
-
   vars:
     ansible_become_password: "{{ ansible_ssh_pass }}"
-
-    elasticsearch_host: localhost
-    elasticsearch_port: 9200
-    elasticsearch_user: admin
-    elasticsearch_password: mysecretpassword
 
   tasks:
 
@@ -36,19 +30,28 @@
     - name: Instalar dependencias
       yum:
         name:
+          - epel-release
           - java-11-openjdk-devel
           - python3-pip
         state: present
       when: ansible_os_family == "RedHat"
 
+    - name: pip Install
+      pip:
+        name:
+          - elasticsearch
+          - pexpect
+        state: present
+
 ### INSTALACION ELS + KIBANA + LOGSTASH
 
-    - name: Instalar Elasticsearch + Kibana + Logstash
+    - name: Instalar ELK
       yum:
         name:
           - elasticsearch
           - kibana
-#          - logstash
+          - logstash
+#          - filebeat
         state: present
       when: ansible_os_family == "RedHat"
 
@@ -74,12 +77,26 @@
 
 ### IMPORTAR CONFIGURACION LOGSTASH
 
-#    - name: Configurar Logstash
-#      template:
-#        src: templates/logstash.conf.j2
-#        dest: /etc/logstash/conf.d
-#        mode: 0666
-#        group: logstash
+    - name: Configurar Logstash
+      template:
+        src: templates/logstash.conf.j2
+        dest: /etc/logstash/logstash.yml
+        mode: 0666
+        group: logstash
+
+    - name: Configurar Logstash config.d
+      template:
+        src: templates/beats-input.conf.j2
+        dest: /etc/logstash/conf.d/beats-input.conf
+        mode: 0666
+        group: logstash
+
+    - name: Configurar Logstash config.d
+      template:
+        src: templates/elasticsearch-output.conf.j2
+        dest: /etc/logstash/conf.d/elasticsearch-output.conf
+        mode: 0666
+        group: logstash
 
 ### INICIAR ELS
 
@@ -97,7 +114,15 @@
         state: restarted
         enabled: yes
 
-### PROXY REVERSE NGINX HTTP
+### INICIAR LOGSTASH
+
+    - name: Iniciar Logstash
+      service:
+        name: logstash
+        state: restarted
+        enabled: yes
+
+### PROXY REVERSE HTTP
 
     - name: Instalar Apache
       yum:
@@ -135,7 +160,7 @@
         state: restarted
         enabled: yes
 
-### ENROLLMENT KIBANA
+### TOKEN FOR ENROLLMENT KIBANA
 
     - name: Nuevo token para Kibana
       shell: /usr/share/elasticsearch/bin/elasticsearch-create-enrollment-token -s kibana
@@ -145,7 +170,7 @@
     - debug:
         var: new_token
 
-### KIBANA CODE VERIFICATION
+### PASS-CODE 2FA VERIFICATION FOR ENROLLMENT KIBANA 
 
     - name: Codigo de verificacion Kibana
       shell: /usr/share/kibana/bin/kibana-verification-code
@@ -157,74 +182,29 @@
 
 ### PASSWORD ELS
 
-#    - name: Password usuario elastic
-#      expect:
-#        command: /usr/share/elasticsearch/bin/elasticsearch-reset-password -u elastic
-#        responses:
-#          '.*?Please confirm that you would like to continue.*?': 'y'
-#      register: consola
-#    - set_fact:
-#        new_password_elastic: "{{ consola.stdout_lines[-1] | regex_replace('^.*: ', '') }}"
-#    - debug:
-#        var: new_password_elastic
+    - name: Password usuario elastic
+      expect:
+        command: /usr/share/elasticsearch/bin/elasticsearch-reset-password -u elastic
+        responses:
+          '.*?Please confirm that you would like to continue.*?': 'y'
+      register: consola
+    - set_fact:
+        new_password_elastic: "{{ consola.stdout_lines[-1] | regex_replace('^.*: ', '') }}"
+    - debug:
+        var: new_password_elastic
 
 ### PASSWORD KIBANA_SYSTEM
 
-#    - name: Password usuario kibana_system
-#      expect:
-#        command: /usr/share/elasticsearch/bin/elasticsearch-reset-password -u kibana_system
-#        responses:
-#          '.*?Please confirm that you would like to continue.*?': 'y'
-#      register: consola
-#    - set_fact:
-#        new_password_kibana_system: "{{ consola.stdout_lines[-1] | regex_replace('^.*: ', '') }}"
-#    - debug:
-#        var: new_password_kibana_system
-
-### VERIFICAR ELS
-
-#    - name: Test con usuario elastic
-#      register: elasticsearch_status
-#      shell: "curl --cacert /etc/elasticsearch/certs/http_ca.crt -u elastic:{{ new_password }} https://localhost:9200"
-#      args:
-#        warn: false
-#    - debug:
-#        var: elasticsearch_status.stdout_lines
-
-#    - name: Test con usuario kibana_system
-#      register: elasticsearch_status
-#      shell: "curl --cacert /etc/elasticsearch/certs/http_ca.crt -u kibana_system:{{ new_password }} https://localhost:9200"
-#      args:
-#        warn: false
-#    - debug:
-#        var: elasticsearch_status.stdout_lines
+    - name: Password usuario kibana_system
+      expect:
+        command: /usr/share/elasticsearch/bin/elasticsearch-reset-password -u kibana_system
+        responses:
+          '.*?Please confirm that you would like to continue.*?': 'y'
+      register: consola
+    - set_fact:
+        new_password_kibana_system: "{{ consola.stdout_lines[-1] | regex_replace('^.*: ', '') }}"
+    - debug:
+        var: new_password_kibana_system
 
 ### PASSWORD ADMIN
 
-    - name: Instalar módulo Elasticsearch
-      pip:
-        name: elasticsearch
-        state: present
-
-    - name: Agregar usuario administrador
-      block:
-        - name: Crear usuario
-          uri:
-            url: "http://{{ elasticsearch_host }}:{{ elasticsearch_port }}/_security/user/{{ elasticsearch_user }}"
-            method: PUT
-            body_format: json
-            body:
-              password: "{{ elasticsearch_password }}"
-              roles: ["superuser"]
-            body_content_type: application/json
-            headers:
-              Content-Type: application/json
-              Authorization: "Basic {{ ('{{ elasticsearch_user }}:' + '{{ elasticsearch_password }}') | b64encode }}"
-          register: result
-          until: result.status == 200 or result.status == 201
-          retries: 5
-          delay: 5
-      rescue:
-        - name: Imprimir error
-          debug:
-            var: result

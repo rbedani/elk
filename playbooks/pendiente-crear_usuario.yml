@@ -1,0 +1,35 @@
+---
+- name: Instalar ELK
+  hosts: master
+
+  vars:
+    elk_new_user: admin
+    elk_new_user_password: asd123
+
+  tasks:
+
+    - name: Crear usuario en Elasticsearch
+      uri:
+        url: http://localhost:9200/_security/user/{{ elk_new_user }}
+        method: PUT
+        body: |
+          {
+            "password" : "{{ elk_new_user }}",
+            "roles" : [ "superuser" ]
+          }
+        body_format: json
+        headers:
+          Authorization: "Basic {{ ('elastic:' + '-g3fy4+IPq9Ta*rXnSeT') | b64encode }}"
+        client_cert: /etc/elasticsearch/certs/http_ca.crt
+        validate_certs: true
+        status_code: 200, 201
+
+    - name: Reiniciar servicio de Elasticsearch
+      service:
+        name: elasticsearch
+        state: restarted
+
+    - name: Reiniciar servicio de Kibana
+      service:
+        name: kibana
+        state: restarted

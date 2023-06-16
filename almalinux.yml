@@ -1,0 +1,46 @@
+---
+- name: Instalar ELK
+  hosts: master
+  become: yes
+  vars:
+    ansible_become_password: "{{ ansible_ssh_pass }}"
+
+  tasks:
+    - name: Cambiar hostname
+      hostname:
+        name: al9
+      notify: Actualizar /etc/hosts
+
+    - name: Actualizar lista de paquetes
+      yum:
+        name: '*'
+        state: latest
+        update_cache: yes
+      when: ansible_os_family == "RedHat"
+
+    - name: Install apps
+      yum:
+        name:
+          - nano
+          - epel-release
+        state: present
+
+    - name: re-update repos
+      yum:
+        name: '*'
+        state: latest
+        update_cache: yes
+      when: ansible_os_family == "RedHat"
+
+    - name: Install htop
+      yum:
+        name:
+          - htop
+        state: present
+
+  handlers:
+    - name: Actualizar /etc/hosts
+      lineinfile:
+        path: /etc/hosts
+        line: "{{ ansible_host }} {{ ansible_fqdn }}"
+        state: present
