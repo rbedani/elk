@@ -1,0 +1,81 @@
+---
+- name: Instalar Agentes
+  hosts: worker
+  become: yes
+  vars:
+    ansible_become_password: "{{ ansible_ssh_pass }}"
+
+  tasks:
+
+### REPOSITORIOS OFICIALES 
+
+    - name: Agregar el repositorio de Elasticsearch
+      yum_repository:
+        name: elastic-8.x
+        description: Elasticsearch repository for 8.x packages
+        baseurl: https://artifacts.elastic.co/packages/8.x/yum
+        gpgcheck: no
+        enabled: yes
+      when: ansible_os_family == "RedHat"
+
+    - name: Importar clave pública de Elasticsearch
+      apt_key:
+        url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+        state: present
+      when: ansible_os_family == "Debian"
+
+    - name: Agregar el repositorio de Elasticsearch
+      apt_repository:
+        repo: deb https://artifacts.elastic.co/packages/8.x/apt stable main
+        state: present
+        filename: elastic-8.x
+      when: ansible_os_family == "Debian"
+
+### PRE-REQUISITOS
+
+    - name: Actualizar lista de paquetes
+      yum:
+        name: '*'
+        state: latest
+        update_cache: yes
+      when: ansible_os_family == "RedHat"
+
+    - name: Actualizar lista de paquetes
+      apt:
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+
+    - name: Instalar dependencias
+      yum:
+        name:
+          - epel-release
+          - java-11-openjdk-devel
+          - python3-pip
+        state: present
+      when: ansible_os_family == "RedHat"
+
+    - name: Instalar dependencias
+      apt:
+        name:
+          - default-jdk
+      when: ansible_os_family == "Debian"
+
+### INSTALACION FILEBEAT
+
+    - name: Instalar Filebeat
+      yum:
+        name:
+          - filebeat
+        state: present
+      when: ansible_os_family == "RedHat"
+
+    - name: Instalar Filebeat
+      apt:
+        name:
+         - filebeat
+      when: ansible_os_family == "Debian"
+
+### IMPORTAR CONFIGURACION FILEBEAT
+
+### INICIAR FILEBEAT
+
