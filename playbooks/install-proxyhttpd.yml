@@ -1,0 +1,44 @@
+- name: Instalar Proxy httpd
+  hosts: master
+  become: true
+  vars:
+    ansible_become_password: "{{ ansible_ssh_pass }}"
+  tasks:
+
+### PROXY REVERSE HTTP
+
+    - name: Instalar Apache
+      yum:
+        name:
+          - httpd
+          - mod_ssl
+        state: present
+      when: ansible_os_family == "RedHat"
+
+    - name: Configurar Apache como proxy HTTP para Kibana
+      template:
+        src: templates/proxyhttpd.conf.j2
+        dest: /etc/httpd/conf.d/kibana.conf
+        mode: 0644
+      when: ansible_os_family == "RedHat"
+
+    - name: Habilitar tráfico HTTP en el firewall
+      firewalld:
+        service: http
+        permanent: true
+        state: enabled
+        immediate: true
+      when: ansible_os_family == "RedHat"
+
+    - name: Configurar permisos de SELinux
+      seboolean:
+        name: httpd_can_network_connect
+        state: yes
+        persistent: true
+      when: ansible_os_family == "RedHat"
+
+    - name: Reiniciar Apache
+      service:
+        name: httpd
+        state: restarted
+        enabled: yes

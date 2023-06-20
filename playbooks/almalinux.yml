@@ -1,5 +1,5 @@
 ---
-- name: Instalar ELK
+- name: Configurar Host
   hosts: master
   become: yes
   vars:
@@ -8,7 +8,7 @@
   tasks:
     - name: Cambiar hostname
       hostname:
-        name: al9
+        name: elk
       notify: Actualizar /etc/hosts
 
     - name: Actualizar lista de paquetes
@@ -16,31 +16,18 @@
         name: '*'
         state: latest
         update_cache: yes
-      when: ansible_os_family == "RedHat"
-
-    - name: Install apps
-      yum:
-        name:
-          - nano
-          - epel-release
-        state: present
-
-    - name: re-update repos
-      yum:
-        name: '*'
-        state: latest
-        update_cache: yes
-      when: ansible_os_family == "RedHat"
-
-    - name: Install htop
-      yum:
-        name:
-          - htop
-        state: present
+      notify: Instalar paquetes
 
   handlers:
     - name: Actualizar /etc/hosts
       lineinfile:
         path: /etc/hosts
         line: "{{ ansible_host }} {{ ansible_fqdn }}"
+        state: present
+
+    - name: Instalar paquetes
+      yum:
+        name:
+          - nano
+          - wget
         state: present
