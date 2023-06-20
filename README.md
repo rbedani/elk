@@ -66,13 +66,20 @@ MODO DE USO:
 ---
 ansible-playbook run.yml -e "Install=true"
 
-Argumentos:
-
 | Argumentos | Detalles |
 | --------- | --------- |
 | Install=true | Comienza la instalacion |
 | Remove=true | Remueve una instalacion previa |
 | Status=true | Ejecuta HealCheking y muestra los resultados |
+
+Cuando finaliza el proceso, tome nota de los resultados finales
+
+La password del usuario Elastic, Kibana_System, El nuevo token para kibana, y el Codigo 2FA de doble autenticacion.
+Se deben insertar en el sitio de Kibana para finalizar la instalacion.
+
+Posiblemente a futuro tengamos el proceso automatizado al 100%
+
+Se recomienda generar un nuevo usuario Admin desde el menu Stack Management
 
 ---
 Rodrigo Daniel Bedani
