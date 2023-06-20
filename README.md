@@ -4,6 +4,8 @@ Automatic deployment of the Elasticsearch stack
 ---
 La siguiente estructura contiene el orden de los elementos que forman parte del rol "Install ELK"
 
+El despliegue ejecuta la instalacion de ElasticSearch + Logstash + Kibana
+
 ```shell
 elk
 ├── README.md
@@ -81,6 +83,40 @@ Posiblemente a futuro tengamos el proceso automatizado al 100%
 
 Se recomienda generar un nuevo usuario Admin desde el menu Stack Management
 
+* Se requiere salida a internet para descargar los paquetes del repositorio oficial.
+* A la fecha de esta documentacion la version actual de ELK: 8.8.1
+Verificado en los siguientes entornos:
+
+| System | Check |
+| ------ | ----- |
+| Debian | OK |
+| RedHat | OK |
+| AlmaLinux | OK |
+
+CPU: 2 Cores
+RAM: 4 GiB
+DISK: 64 GiB
+
+Roadmap:
+---
+### REPOSITORIOS OFICIALES
+### PRE-REQUISITOS
+### INSTALACION ELS + KIBANA + LOGSTASH
+### CERTIFICADOS (omitido)
+### IMPORTAR CONFIGURACION ELS
+### IMPORTAR CONFIGURACION KIBANA
+### IMPORTAR CONFIGURACION LOGSTASH
+### INICIAR ELS
+### INICIAR KIBANA
+### INICIAR LOGSTASH
+### PROXY REVERSE HTTP
+### TOKEN FOR ENROLLMENT KIBANA
+### PASS-CODE 2FA VERIFICATION FOR ENROLLMENT KIBANA
+### PASSWORD ELS
+### PASSWORD KIBANA_SYSTEM
+### API - ADD USER/PASSWORD ADMIN (pendiente)
+
+ABOUT ME
 ---
 Rodrigo Daniel Bedani
 rbedani@flexxible.com

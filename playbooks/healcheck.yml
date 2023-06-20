@@ -27,3 +27,6 @@
     - debug:
         var: logstash_status.stdout_lines
       # Config Validation Result: OK. Exiting Logstash
+
+# curl -XGET http://localhost:9200/_cluster/health?pretty=true
+# journalctl -xeu elasticsearch.service
