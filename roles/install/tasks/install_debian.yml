@@ -1,0 +1,14 @@
+- name: Instalando Elasticsearch
+  apt:
+    name:
+      - elasticsearch
+
+- name: Instalando Logstash
+  apt:
+    name:
+      - logstash
+
+- name: Instalando Kibana
+  apt:
+    name:
+      - kibana

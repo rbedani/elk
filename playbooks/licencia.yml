@@ -1,0 +1,40 @@
+---
+- name: Instalar Elasticsearch License
+  hosts: master
+ 
+  tasks:
+    - name: Copiar archivo de licencia
+      copy:
+        src: files/license.json
+        dest: /etc/elasticsearch/license.json
+        mode: 0644
+      register: copia_licencia
+
+    - name: Comprobar si el archivo de licencia se copió correctamente
+      fail:
+        msg: "No se pudo copiar el archivo de licencia"
+      when: copia_licencia.failed
+
+    - name: Añadir licencia a Elasticsearch
+      uri:
+        url: "http://localhost:9200/_license"
+        method: PUT
+        body_format: json
+        body:
+          license: "{{ lookup('file', '/etc/elasticsearch/license.json') }}"
+          acknowledge: true
+        return_content: yes
+      register: respuesta_elasticsearch
+
+    - name: Comprobar respuesta de Elasticsearch
+      fail:
+        msg: "No se pudo añadir la licencia a Elasticsearch. Respuesta: {{ respuesta_elasticsearch.content }}"
+      when: respuesta_elasticsearch.status != 200
+
+    - name: Reiniciar Elasticsearch
+      service:
+        name: elasticsearch
+        state: restarted
+
+
+

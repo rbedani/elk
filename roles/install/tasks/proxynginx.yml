@@ -1,0 +1,26 @@
+- name: Instalar Nginx
+  apt:
+    name: nginx
+    state: present
+
+- name: Importar Sites Kibana
+  template:
+    src: templates/proxynginx.conf.j2
+    dest: /etc/nginx/sites-available/kibana.conf
+    mode: 0644
+
+- name: Habilitar Sites Kibana
+  file:
+    src: /etc/nginx/sites-available/kibana.conf
+    dest: /etc/nginx/sites-enabled/kibana.conf
+    state: link
+
+- name: Deshabilitar configuración por defecto de Nginx
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: Reiniciar Nginx
+  service:
+    name: nginx
+    state: restarted

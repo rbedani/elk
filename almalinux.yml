@@ -4,7 +4,7 @@
   become: yes
   vars:
     ansible_become_password: "{{ ansible_ssh_pass }}"
-
+    
   tasks:
     - name: Cambiar hostname
       hostname:

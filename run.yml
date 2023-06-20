@@ -1,0 +1,20 @@
+---
+- name: ELK
+  #hosts: '{{ worker }}'
+  hosts: master
+  become: yes
+  vars:
+    ansible_become_password: "{{ ansible_ssh_pass }}"
+
+  tasks:
+
+  - name: Install
+    include_role:
+      name: install
+    when: install | default(False)
+
+  - name: Remove
+    include_role:
+      name: remove
+    when: remove | default(False)
+

@@ -1,0 +1,31 @@
+- name: Instalar Apache
+  yum:
+    name:
+      - httpd
+      - mod_ssl
+    state: present
+
+- name: Configurar Apache como proxy HTTP para Kibana
+  template:
+    src: templates/proxyhttpd.conf.j2
+    dest: /etc/httpd/conf.d/kibana.conf
+    mode: 0644
+
+- name: Habilitar tráfico HTTP en el firewall
+  firewalld:
+    service: http
+    permanent: true
+    state: enabled
+    immediate: true
+
+- name: Configurar permisos de SELinux
+  seboolean:
+    name: httpd_can_network_connect
+    state: yes
+    persistent: true
+
+- name: Reiniciar Apache
+  service:
+    name: httpd
+    state: restarted
+    enabled: yes

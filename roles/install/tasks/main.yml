@@ -1,0 +1,24 @@
+---
+- name: REPOSITORIOS
+  include_tasks: config_repo_debian.yml
+  when: ansible_os_family == "Debian"
+
+- name: REPOSITORIOS
+  include_tasks: config_repo_redhat.yml
+  when: ansible_os_family == "RedHat"
+
+- name: PRE-REQUISITOS
+  include_tasks: dependencias_debian.yml
+  when: ansible_os_family == "Debian"
+
+- name: PRE-REQUISITOS
+  include_tasks: dependencias_redhat.yml
+  when: ansible_os_family == "RedHat"
+
+- name: INSTALACION ELS
+  include_tasks: install_debian.yml
+  when: ansible_os_family == "Debian"
+
+- name: INSTALACION ELS
+  include_tasks: install_redhat.yml
+  when: ansible_os_family == "RedHat"

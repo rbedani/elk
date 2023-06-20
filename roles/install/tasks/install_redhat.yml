@@ -1,0 +1,14 @@
+- name: Instalando Elasticsearch
+  yum:
+    name:
+      - elasticsearch
+
+- name: Instalando Logstash
+  yum:
+    name:
+      - logstash
+
+- name: Instalando Kibana
+  yum:
+    name:
+      - kibana

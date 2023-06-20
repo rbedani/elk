@@ -1,0 +1,7 @@
+- name: Agregar el repositorio de Elasticsearch
+  yum_repository:
+    name: elastic-8.x
+    description: Elasticsearch repository for 8.x packages
+    baseurl: https://artifacts.elastic.co/packages/8.x/yum
+    gpgcheck: no
+    enabled: yes

@@ -51,7 +51,6 @@
           - elasticsearch
           - kibana
           - logstash
-#          - filebeat
         state: present
       when: ansible_os_family == "RedHat"
 
@@ -207,4 +206,14 @@
         var: new_password_kibana_system
 
 ### PASSWORD ADMIN
+
+### MOSTRAR LICENSIA
+
+    - name: Mostrar Licencia
+      register: elasticsearch_license
+      shell: "curl --cacert /etc/elasticsearch/certs/http_ca.crt -u elastic:{{ new_password_elastic }} https://localhost:9200/_license"
+      args:
+        warn: false
+    - debug:
+        var: elasticsearch_license.stdout_lines
 
