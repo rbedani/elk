@@ -2,19 +2,25 @@
 - name: Nuevo token para Kibana
   shell: /usr/share/elasticsearch/bin/elasticsearch-create-enrollment-token -s kibana
   register: kibana_token
+  when: version == "8" or version == "7"
 - set_fact:
     new_token: "{{ kibana_token.stdout_lines[-1] | regex_replace('^.*: ', '') }}"
+  when: version == "8" or version == "7"
 - debug:
     var: new_token
+  when: version == "8" or version == "7"
 
 ### PASS-CODE 2FA VERIFICATION FOR ENROLLMENT KIBANA 
 - name: Codigo de verificacion Kibana
   shell: /usr/share/kibana/bin/kibana-verification-code
   register: kibana_code
+  when: version == "8" or version == "7"
 - set_fact:
     new_code: "{{ kibana_code.stdout_lines }}"
+  when: version == "8" or version == "7"
 - debug:
     var: kibana_code.stdout_lines
+  when: version == "8" or version == "7"
 
 ### PASSWORD ELS
 - name: Password usuario elastic
@@ -23,10 +29,13 @@
     responses:
       '.*?Please confirm that you would like to continue.*?': 'y'
   register: consola
+  when: version == "8" or version == "7"
 - set_fact:
     new_password_elastic: "{{ consola.stdout_lines[-1] | regex_replace('^.*: ', '') }}"
+  when: version == "8" or version == "7"
 - debug:
     var: new_password_elastic
+  when: version == "8" or version == "7"
 
 ### PASSWORD KIBANA_SYSTEM
 - name: Password usuario kibana_system
@@ -35,8 +44,11 @@
     responses:
       '.*?Please confirm that you would like to continue.*?': 'y'
   register: consola
+  when: version == "8" or version == "7"
 - set_fact:
     new_password_kibana_system: "{{ consola.stdout_lines[-1] | regex_replace('^.*: ', '') }}"
+  when: version == "8" or version == "7"
 - debug:
     var: new_password_kibana_system
+  when: version == "8" or version == "7"
 

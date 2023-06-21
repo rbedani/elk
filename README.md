@@ -4,97 +4,76 @@ Automatic deployment of the Elasticsearch stack
 ---
 La siguiente estructura contiene el orden de los elementos que forman parte del rol "Install ELK"
 
-El despliegue ejecuta la instalacion de ElasticSearch + Logstash + Kibana
+El despliegue ejecuta la instalación de ElasticSearch + Logstash + Kibana
 
 ```shell
 elk
 ├── README.md
-├── playbooks
-│   ├── almalinux.yml
-│   ├── delete.yml
-│   ├── healcheck.yml
-│   ├── install copy.yml
-│   ├── install-agents.yml
-│   ├── install-config-elk.yml
-│   ├── install-config-kibana.yml
-│   ├── install-dependency.yml
-│   ├── install-download.yml
-│   ├── install-elk.yml
-│   ├── install-kibana.yml
-│   ├── install-proxyhttpd.yml
-│   ├── install-proxynginx.yml
-│   ├── install-redhat.yml
-│   ├── install-ubuntu.yml
-│   ├── install-user.yml
-│   ├── licencia.yml
-│   ├── pendiente-crear_usuario.yml
-│   ├── reload.yml
-│   └── remove.yml
 ├── roles
-│   ├── healcheking
-│   │   └── tasks
-│   │       └── main.yml
 │   ├── install
-│   │   ├── files
-│   │   │   └── license.json
-│   │   └── tasks
-│   │       ├── config_elk.yml
-│   │       ├── config_repo_debian.yml
-│   │       ├── config_repo_redhat.yml
-│   │       ├── dependencias_debian.yml
-│   │       ├── dependencias_redhat.yml
-│   │       ├── install_debian.yml
-│   │       ├── install_redhat.yml
-│   │       ├── main.yml
-│   │       ├── notificacion.yml
-│   │       ├── proxyhttpd.yml
-│   │       ├── proxynginx.yml
-│   │       └── services.yml
-│   ├── remove
-│   │   └── tasks
-│   │       └── main.yml
-│   └── templates
-│       ├── beats-input.conf.j2
-│       ├── elasticsearch-output.conf.j2
-│       ├── elasticsearch.conf.j2
-│       ├── kibana.conf.j2
-│       ├── logstash.conf.j2
-│       ├── proxyhttpd.conf.j2
-│       └── proxynginx.conf.j2
+│   │   ├── tasks
+│   │   │   ├── config_repo_debian.yml
+│   │   │   ├── config_repo_redhat.yml
+│   │   │   ├── import_config_elk.yml
+│   │   │   ├── import_license.yml
+│   │   │   ├── install_dependencias_debian.yml
+│   │   │   ├── install_dependencias_redhat.yml
+│   │   │   ├── install_elk_debian.yml
+│   │   │   ├── install_elk_redhat.yml
+│   │   │   ├── install_proxyhttpd.yml
+│   │   │   ├── install_proxynginx.yml
+│   │   │   ├── main.yml
+│   │   │   ├── notificacion.yml
+│   │   │   └── reload_services.yml
+│   │   └── templates
+│   │       ├── beats-input.conf.j2
+│   │       ├── elasticsearch-output.conf.j2
+│   │       ├── elasticsearch.conf.j2
+│   │       ├── kibana.conf.j2
+│   │       ├── logstash.conf.j2
+│   │       ├── proxyhttpd.conf.j2
+│   │       └── proxynginx.conf.j2
 └── run.yml
 ```
 
 EJEMPLO MODO DE USO:
 ---
-ansible-playbook run.yml -e "Install=true" -e "version=6"
+ansible-playbook run.yml -e "Install=true" -e "version=7"
 
 | Argumentos | Detalles |
 | --------- | --------- |
-| install=true | Comienza la instalacion |
-| remove=true | Remueve una instalacion previa (pendiente) |
+| install=true | Comienza la instalación |
+| remove=true | Remueve una instalación previa (pendiente) |
 | status=true | Ejecuta "HealCheking" y muestra los resultados (pendiente) |
 | version=6 | selecciona los repos 6.x |
-| version=7 | selecciona los repos 7.x |
+| version=7 | selecciona los repos 7.x (recomendado)|
 | version=8 | selecciona los repos 8.x |
 
 NOTA:
 ---
-Cuando finaliza el proceso, tome nota de los resultados finales
+* Se requiere salida a internet para descargar los paquetes del repositorio oficial.
+* A la fecha de esta documentación la versión actual de ELK: 8.8.1 (Requiere licencia)
+* En esta instancia incluye una licencia básica para la versión de ELK.
 
-La password del usuario Elastic, Kibana_System, El nuevo token para kibana, y el Codigo 2FA de doble autenticacion.
-Se deben insertar en el sitio de Kibana para finalizar la instalacion.
+ELK 8:
+---
+Si realiza la instalación de la versión 8 tome en cuenta los siguientes puntos:
+* Cuando finaliza el proceso, tome nota de los resultados finales
+* La password del usuario Elastic, Kibana_System, El nuevo token para kibana, y el Código 2FA de doble autenticación.
+* Se deben insertar en el sitio de Kibana para finalizar la instalación, pulse el boton instalación manual y rellene los datos de usuario y contraseña Kibana_System que se le ha proporcionado en la salida del playbook.
+
 
 Posiblemente a futuro tengamos el proceso automatizado al 100%
 
-Se recomienda generar un nuevo usuario Admin desde el menu Stack Management
+License:
+---
+ELK requiere de una licencia para permanecer con las funciones básicas ó puede solicitar la trial por 30 días o comprar la licencia premium.
+Puede registrar su licencia desde el menú "License Management"
 
-* Se requiere salida a internet para descargar los paquetes del repositorio oficial.
-* A la fecha de esta documentacion la version actual de ELK: 8.8.1 (Requiere licencia)
-* En esta instancia se carga una licencia basica para la version de ELK: 6.x
 Verificado en los siguientes entornos:
 ---
 
-Sistema Operativos soportados:
+Sistema Operativos suportados:
 ---
 | System | Check |
 | ------ | ----- |

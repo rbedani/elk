@@ -1,3 +1,11 @@
+- name: Set version
+  block:
+    - fail:
+        msg: "¡Atención! Debes agregar -e 'version=x' donde x es la versión de ELK que intentas instalar. Actualmente puedo ofrecer 6,7 y 8"
+      when: version is not defined or version|string != "6" and version|string != "7" and version|string != "8"
+    - meta: noop
+  when: version is not defined or version|string != "6" and version|string != "7" and version|string != "8"
+
 - name: Elasticsearch repository for 8.x packages
   yum_repository:
     name: elasticsearch-8.x
@@ -5,7 +13,7 @@
     baseurl: https://artifacts.elastic.co/packages/8.x/yum
     gpgcheck: no
     enabled: yes
-  when: version == 8
+  when: version == "8"
 
 - name: Elasticsearch repository for 7.x packages
   yum_repository:
@@ -14,7 +22,7 @@
     baseurl: https://artifacts.elastic.co/packages/7.x/yum
     gpgcheck: no
     enabled: yes
-  when: version == 7
+  when: version == "7"
 
 - name: Elasticsearch repository for 6.x packages
   yum_repository:
@@ -23,4 +31,4 @@
     baseurl: https://artifacts.elastic.co/packages/6.x/yum
     gpgcheck: no
     enabled: yes
-  when: version == 6
+  when: version == "6"

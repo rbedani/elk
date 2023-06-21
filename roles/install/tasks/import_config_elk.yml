@@ -5,6 +5,7 @@
     dest: /etc/elasticsearch/elasticsearch.yml
     mode: 0660
     group: elasticsearch
+  when: version == "8"
 
 ### IMPORTAR CONFIGURACION KIBANA
 - name: Configurar Kibana
@@ -13,6 +14,7 @@
     dest: /etc/kibana/kibana.yml
     mode: 0660
     group: kibana
+  when: version == "8"
 
 ### IMPORTAR CONFIGURACION LOGSTASH
 - name: Configurar Logstash
@@ -21,6 +23,7 @@
     dest: /etc/logstash/logstash.yml
     mode: 0666
     group: logstash
+  when: version == "8"
 
 - name: Configurar Logstash config.d
   template:
@@ -28,6 +31,7 @@
     dest: /etc/logstash/conf.d/beats-input.conf
     mode: 0666
     group: logstash
+  when: version == "8"
 
 - name: Configurar Logstash config.d
   template:
@@ -35,3 +39,4 @@
     dest: /etc/logstash/conf.d/elasticsearch-output.conf
     mode: 0666
     group: logstash
+  when: version == "8"

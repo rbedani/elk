@@ -1,0 +1,30 @@
+- name: import license
+  copy:
+    src: files/license_ver_6.json
+    dest: /usr/share/elasticsearch/license_ver_6.json
+    mode: 0660
+    group: elasticsearch
+  when: version == "6"
+
+#- name: Apply license by shell
+#  shell: /usr/shared/elasticsearch/bin/elasticsearch-license --in /usr/shared/elasticsearch/license_ver_6.json"
+#  when: version == "6"
+
+- name: Instalar licencia
+  uri:
+    url: "http://localhost:9200//_xpack/license/start_basic"
+    method: PUT
+    headers:
+      Content-Type: "application/json"
+    body_format: json
+    body:
+      src: /usr/share/elasticsearch/license_ver_6.json
+    user: elastic
+    force_basic_auth: yes
+  register: resultado
+  when: version == "6"
+
+- name: Verificar resultado
+  debug:
+    var: resultado
+  when: version == "6"

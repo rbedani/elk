@@ -1,3 +1,11 @@
+- name: Set version
+  block:
+    - fail:
+        msg: "¡Atención! Debes agregar -e 'version=x' donde x es la versión de ELK que intentas instalar. Actualmente puedo ofrecer 6,7 y 8"
+      when: version is not defined or version|string != "6" and version|string != "7" and version|string != "8"
+    - meta: noop
+  when: version is not defined or version|string != "6" and version|string != "7" and version|string != "8"
+
 - name: Importar clave pública de Elasticsearch
   apt_key:
     url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
