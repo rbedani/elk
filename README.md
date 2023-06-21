@@ -77,11 +77,10 @@ ELK requiere de una licencia.
 Puede solicitar una trial por 30 días ó adquirir la licencia premium con todas las características.
 Puede consultar su licencia desde el menú "License Management"
 
-Verificado en los siguientes entornos:
----
-
 Sistema Operativos suportados:
 ---
+Verificado en los siguientes entornos:
+
 | System | Check |
 | ------ | ----- |
 | Debian | OK |
@@ -89,7 +88,7 @@ Sistema Operativos suportados:
 | RedHat | OK |
 | AlmaLinux | OK |
 
-Requisitos:
+Requisitos mínimos:
 ---
 CPU: 2 Cores
 RAM: 4 GiB
