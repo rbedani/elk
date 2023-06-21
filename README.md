@@ -64,7 +64,7 @@ elk
 └── run.yml
 ```
 
-MODO DE USO:
+EJEMPLO MODO DE USO:
 ---
 ansible-playbook run.yml -e "Install=true"
 
@@ -72,8 +72,10 @@ ansible-playbook run.yml -e "Install=true"
 | --------- | --------- |
 | Install=true | Comienza la instalacion |
 | Remove=true | Remueve una instalacion previa |
-| Status=true | Ejecuta HealCheking y muestra los resultados |
+| Status=true | Ejecuta "HealCheking" y muestra los resultados |
 
+NOTA:
+---
 Cuando finaliza el proceso, tome nota de los resultados finales
 
 La password del usuario Elastic, Kibana_System, El nuevo token para kibana, y el Codigo 2FA de doble autenticacion.
@@ -86,13 +88,19 @@ Se recomienda generar un nuevo usuario Admin desde el menu Stack Management
 * Se requiere salida a internet para descargar los paquetes del repositorio oficial.
 * A la fecha de esta documentacion la version actual de ELK: 8.8.1
 Verificado en los siguientes entornos:
+---
 
+Sistema Operativos soportados:
+---
 | System | Check |
 | ------ | ----- |
 | Debian | OK |
+| Ubuntu | OK |
 | RedHat | OK |
 | AlmaLinux | OK |
 
+Requisitos:
+---
 CPU: 2 Cores
 RAM: 4 GiB
 DISK: 64 GiB
