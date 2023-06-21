@@ -93,7 +93,7 @@ Hardware:
 ---
 Fuente: https://www.elastic.co/guide/en/cloud-enterprise/current/ece-hardware-prereq.html
 
-Requisitos Memory:
+Memory:
 ---
 
 | Memory | Coordinators | Directors | Proxies | Allocators |
