@@ -66,13 +66,16 @@ elk
 
 EJEMPLO MODO DE USO:
 ---
-ansible-playbook run.yml -e "Install=true"
+ansible-playbook run.yml -e "Install=true" -e "version=6"
 
 | Argumentos | Detalles |
 | --------- | --------- |
-| Install=true | Comienza la instalacion |
-| Remove=true | Remueve una instalacion previa |
-| Status=true | Ejecuta "HealCheking" y muestra los resultados |
+| install=true | Comienza la instalacion |
+| remove=true | Remueve una instalacion previa (pendiente) |
+| status=true | Ejecuta "HealCheking" y muestra los resultados (pendiente) |
+| version=6 | selecciona los repos 6.x |
+| version=7 | selecciona los repos 7.x |
+| version=8 | selecciona los repos 8.x |
 
 NOTA:
 ---
@@ -86,7 +89,8 @@ Posiblemente a futuro tengamos el proceso automatizado al 100%
 Se recomienda generar un nuevo usuario Admin desde el menu Stack Management
 
 * Se requiere salida a internet para descargar los paquetes del repositorio oficial.
-* A la fecha de esta documentacion la version actual de ELK: 8.8.1
+* A la fecha de esta documentacion la version actual de ELK: 8.8.1 (Requiere licencia)
+* En esta instancia se carga una licencia basica para la version de ELK: 6.x
 Verificado en los siguientes entornos:
 ---
 

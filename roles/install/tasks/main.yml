@@ -15,12 +15,12 @@
   include_tasks: dependencias_redhat.yml
   when: ansible_os_family == "RedHat"
 
-- name: INSTALACION ELS
-  include_tasks: install_debian.yml
+- name: INSTALACION ELK
+  include_tasks: install_elk_debian.yml
   when: ansible_os_family == "Debian"
 
-- name: INSTALACION ELS
-  include_tasks: install_redhat.yml
+- name: INSTALACION ELK
+  include_tasks: install_elk_redhat.yml
   when: ansible_os_family == "RedHat"
 
 - name: IMPORTAR CONFIGURACION ELK

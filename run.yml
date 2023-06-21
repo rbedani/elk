@@ -5,6 +5,7 @@
   become: yes
   vars:
     ansible_become_password: "{{ ansible_ssh_pass }}"
+    elasticsearch_version: "{{ version }}"
 
   tasks:
 

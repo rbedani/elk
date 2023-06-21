@@ -3,8 +3,23 @@
     url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
     state: present
 
-- name: Agregar el repositorio de Elasticsearch
+- name: Elasticsearch repository for 8.x packages
   apt_repository:
     repo: deb https://artifacts.elastic.co/packages/8.x/apt stable main
     state: present
-    filename: elastic-8.x
+    filename: elasticsearch-8.x
+  when: version == 8
+
+- name: Elasticsearch repository for 7.x packages
+  apt_repository:
+    repo: deb https://artifacts.elastic.co/packages/7.x/apt stable main
+    state: present
+    filename: elasticsearch-7.x
+  when: version == 7
+
+- name: Elasticsearch repository for 6.x packages
+  apt_repository:
+    repo: deb https://artifacts.elastic.co/packages/6.x/apt stable main
+    state: present
+    filename: elasticsearch-6.x
+  when: version == 6
