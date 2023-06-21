@@ -1,7 +1,7 @@
 ---
 - name: ELK
-  #hosts: '{{ worker }}'
-  hosts: master
+  hosts: '{{ worker }}'
+  #hosts: master
   become: yes
   vars:
     ansible_become_password: "{{ ansible_ssh_pass }}"
