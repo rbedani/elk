@@ -73,8 +73,9 @@ Si realiza la instalación de la versión 8 tome en cuenta los siguientes puntos
 
 License:
 ---
-ELK requiere de una licencia para permanecer con las funciones básicas ó puede solicitar la trial por 30 días o comprar la licencia premium.
-Puede registrar su licencia desde el menú "License Management"
+ELK requiere de una licencia. 
+Puede solicitar una trial por 30 días ó adquirir la licencia premium con todas las caracteristicas.
+Puede consultar su licencia desde el menú "License Management"
 
 Verificado en los siguientes entornos:
 ---
