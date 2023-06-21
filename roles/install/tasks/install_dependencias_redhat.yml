@@ -7,7 +7,6 @@
 - name: Instalar dependencias
   yum:
     name:
-      - epel-release
       - java-11-openjdk-devel
       - python3-pip
     state: present
@@ -15,6 +14,5 @@
 - name: pip Install
   pip:
     name:
-      - elasticsearch
       - pexpect
     state: present

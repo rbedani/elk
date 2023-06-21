@@ -9,6 +9,7 @@ El despliegue ejecuta la instalación de ElasticSearch + Logstash + Kibana
 ```shell
 elk
 ├── README.md
+├── playbooks
 ├── roles
 │   ├── install
 │   │   ├── tasks
@@ -26,19 +27,15 @@ elk
 │   │   │   ├── notificacion.yml
 │   │   │   └── reload_services.yml
 │   │   └── templates
-│   │       ├── beats-input.conf.j2
-│   │       ├── elasticsearch-output.conf.j2
-│   │       ├── elasticsearch.conf.j2
-│   │       ├── kibana.conf.j2
-│   │       ├── logstash.conf.j2
 │   │       ├── proxyhttpd.conf.j2
 │   │       └── proxynginx.conf.j2
 └── run.yml
 ```
+El directorio Playbooks contiene procesos en desarrollo.
 
 EJEMPLO MODO DE USO:
 ---
-ansible-playbook run.yml -e "Install=true" -e "version=7"
+ansible-playbook run.yml -e "Install=true" -e "version=8"
 
 | Argumentos | Detalles |
 | --------- | --------- |
@@ -46,24 +43,33 @@ ansible-playbook run.yml -e "Install=true" -e "version=7"
 | remove=true | Remueve una instalación previa (pendiente) |
 | status=true | Ejecuta "HealCheking" y muestra los resultados (pendiente) |
 | version=6 | selecciona los repos 6.x |
-| version=7 | selecciona los repos 7.x (recomendado)|
+| version=7 | selecciona los repos 7.x |
 | version=8 | selecciona los repos 8.x |
 
 NOTA:
 ---
 * Se requiere salida a internet para descargar los paquetes del repositorio oficial.
-* A la fecha de esta documentación la versión actual de ELK: 8.8.1 (Requiere licencia)
-* En esta instancia incluye una licencia básica para la versión de ELK.
+* A la fecha de esta documentación la versión actual de ELK: 8.8.1
+* Por defecto incluye una licencia básica para el uso de ELK.
+* La configuración esta por defecto desde los repositorios oficiales de ELK
+* Considere modificarlos y establecer los parámetros que necesite siguiendo las instrucciones https://www.elastic.co/guide/index.html#viewall
 
 ELK 8:
 ---
 Si realiza la instalación de la versión 8 tome en cuenta los siguientes puntos:
-* Cuando finaliza el proceso, tome nota de los resultados finales
-* La password del usuario Elastic, Kibana_System, El nuevo token para kibana, y el Código 2FA de doble autenticación.
-* Se deben insertar en el sitio de Kibana para finalizar la instalación, pulse el boton instalación manual y rellene los datos de usuario y contraseña Kibana_System que se le ha proporcionado en la salida del playbook.
+* Cuando finaliza el proceso, tome nota de los resultados finales:
+    - New_Token
+    - Password de Kibana_System
+    - COD2FA
+    - Password del usuario Elastic
 
-
-Posiblemente a futuro tengamos el proceso automatizado al 100%
+* Se deben insertar en el sitio de Kibana "http://direccionIP" para finalizar la instalación:
+    - inserte el valor del token generado anteriormente
+    - pulse el boton "Install manual"
+    - pulse el boton "Check Address" (no modifique nada)
+    - rellene la contraseña de Kibana_System que se le ha proporcionado en la salida del playbook
+    - confirme el certificado de autenticación
+    - finalice la instalación confirmando "Configure Elastic"
 
 License:
 ---
@@ -94,18 +100,17 @@ Roadmap:
 ### PRE-REQUISITOS
 ### INSTALACION ELS + KIBANA + LOGSTASH
 ### CERTIFICADOS (omitido)
-### IMPORTAR CONFIGURACION ELS
-### IMPORTAR CONFIGURACION KIBANA
-### IMPORTAR CONFIGURACION LOGSTASH
+### IMPORTAR CONFIGURACION ELS ( por defecto )
+### IMPORTAR CONFIGURACION KIBANA ( añade: server.publicBaseUrl: "http://localhost" )
+### IMPORTAR CONFIGURACION LOGSTASH ( por defecto NOTA: Se recomienda configurar /etc/logstash/config.d/ con los agentes y puertos que requiera )
 ### INICIAR ELS
 ### INICIAR KIBANA
 ### INICIAR LOGSTASH
 ### PROXY REVERSE HTTP
 ### TOKEN FOR ENROLLMENT KIBANA
+### PASSWORD KIBANA_SYSTEM
 ### PASS-CODE 2FA VERIFICATION FOR ENROLLMENT KIBANA
 ### PASSWORD ELS
-### PASSWORD KIBANA_SYSTEM
-### API - ADD USER/PASSWORD ADMIN (pendiente)
 
 ABOUT ME
 ---

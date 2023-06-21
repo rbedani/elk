@@ -1,42 +1,20 @@
 ### IMPORTAR CONFIGURACION ELS
-- name: Configurar Elasticsearch
-  template:
-    src: templates/elasticsearch.conf.j2
-    dest: /etc/elasticsearch/elasticsearch.yml
-    mode: 0660
-    group: elasticsearch
-  when: version == "8"
 
 ### IMPORTAR CONFIGURACION KIBANA
-- name: Configurar Kibana
-  template:
-    src: templates/kibana.conf.j2
-    dest: /etc/kibana/kibana.yml
-    mode: 0660
-    group: kibana
+- name: Configurar Kibana 7
+  lineinfile:
+    path: /etc/kibana/kibana.yml
+    line: 'server.publicBaseUrl: "http://localhost"'
+    insertafter: EOF
+    state: present
+  when: version == "7"
+
+- name: Configurar Kibana 8
+  lineinfile:
+    path: /etc/kibana/kibana.yml
+    line: 'server.publicBaseUrl: "http://localhost"'
+    insertafter: EOF
+    state: present
   when: version == "8"
 
 ### IMPORTAR CONFIGURACION LOGSTASH
-- name: Configurar Logstash
-  template:
-    src: templates/logstash.conf.j2
-    dest: /etc/logstash/logstash.yml
-    mode: 0666
-    group: logstash
-  when: version == "8"
-
-- name: Configurar Logstash config.d
-  template:
-    src: templates/beats-input.conf.j2
-    dest: /etc/logstash/conf.d/beats-input.conf
-    mode: 0666
-    group: logstash
-  when: version == "8"
-
-- name: Configurar Logstash config.d
-  template:
-    src: templates/elasticsearch-output.conf.j2
-    dest: /etc/logstash/conf.d/elasticsearch-output.conf
-    mode: 0666
-    group: logstash
-  when: version == "8"
