@@ -88,11 +88,30 @@ Verificado en los siguientes entornos:
 | RedHat | OK |
 | AlmaLinux | OK |
 
-Requisitos mínimos:
 ---
-CPU: 2 Cores
-RAM: 4 GiB
-DISK: 64 GiB
+Hardware:
+---
+Fuente: https://www.elastic.co/guide/en/cloud-enterprise/current/ece-hardware-prereq.html
+
+Requisitos Memory:
+---
+
+| Memory | Coordinators | Directors | Proxies | Allocators |
+| ------ | ------------ | --------- | ------- | ---------- |
+| Minimum to install | 8 GB RAM | 8 GB RAM | 8 GB RAM | 8 GB RAM |
+| Minimum recommended | 16 GB RAM | 8 GB RAM | 8 GB RAM | 128 GB to 256 GB RAM1 |
+| Small deployment2	| 32 GB RAM | 32 GB RAM | 16 GB RAM | 128 GB RAM |
+| Medium deployment2 | 32 GB RAM | 32 GB RAM | 32 GB RAM | 256 GB RAM |
+| Large deployment3 | 128 GB RAM | 128 GB RAM | 128 GB RAM | 256 GB RAM |
+
+Storage:
+---
+
+|	Storage	|	Coordinators	|	Directors	|	Proxies	|	Allocators	|
+|	 ---	|	 ---	|	 ---	|	 ---	|	 ---	|
+|	Minimum to install	|	10 GB	|	10 GB	|	15 GB	|	10 GB	|
+|	Minimum recommended	|	1:4 RAM-to-storage ratio1	|	1:4 RAM-to-storage ratio1	|	|1:4 RAM-to-storage ratio1	|	Enough storage to support the RAM-to-storage ratio2	|
+
 
 Roadmap:
 ---
