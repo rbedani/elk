@@ -1,9 +1,6 @@
 Despliegue automático de la pila Elasticsearch
 ---
-Automatic deployment of the Elasticsearch stack
----
 La siguiente estructura contiene el orden de los elementos que forman parte del rol "Install ELK"
-
 El despliegue ejecuta la instalación de ElasticSearch + Logstash + Kibana
 
 ```shell
