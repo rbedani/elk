@@ -31,13 +31,13 @@ El directorio Playbooks contiene procesos en desarrollo.
 
 EJEMPLO MODO DE USO:
 ---
-ansible-playbook run.yml -e "Install=true" -e "version=8"
+ansible-playbook run.yml -e "tasks_type=install" -e "version=8"
 
 | Argumentos | Detalles |
 | --------- | --------- |
-| install=true | Comienza la instalación |
-| remove=true | Remueve una instalación previa (pendiente) |
-| status=true | Ejecuta "HealCheking" y muestra los resultados (pendiente) |
+| tasks_type=install | Comienza la instalación |
+| tasks_type=remove | Remueve una instalación previa (pendiente) |
+| tasks_type=status | Ejecuta "HealCheking" y muestra los resultados (pendiente) |
 | version=6 | selecciona los repos 6.x |
 | version=7 | selecciona los repos 7.x |
 | version=8 | selecciona los repos 8.x |
