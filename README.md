@@ -6,7 +6,6 @@ El despliegue ejecuta la instalación de ElasticSearch + Logstash + Kibana
 ```shell
 elk
 ├── README.md
-├── playbooks
 ├── roles
 │   ├── install
 │   │   ├── tasks
