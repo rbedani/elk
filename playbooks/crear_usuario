@@ -3,8 +3,8 @@
   hosts: master
 
   vars:
-    elk_new_user: admin
-    elk_new_user_password: asd123
+    elk_new_user: 
+    elk_new_user_password: 
 
   tasks:
 
