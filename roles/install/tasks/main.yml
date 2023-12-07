@@ -1,7 +1,6 @@
 ---
 - name: REPOSITORIOS
   include_tasks: config_repo_debian.yml
-
   when: ansible_os_family == "Debian"
 
 - name: REPOSITORIOS
