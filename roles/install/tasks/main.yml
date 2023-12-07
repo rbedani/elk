@@ -1,19 +1,19 @@
 ---
-- name: REPOSITORIOS
-  include_tasks: config_repo_debian.yml
-  when: ansible_os_family == "Debian"
+# - name: REPOSITORIOS
+#   include_tasks: config_repo_debian.yml
+#   when: ansible_os_family == "Debian"
 
-- name: REPOSITORIOS
-  include_tasks: config_repo_redhat.yml
-  when: ansible_os_family == "RedHat"
+# - name: REPOSITORIOS
+#   include_tasks: config_repo_redhat.yml
+#   when: ansible_os_family == "RedHat"
 
-- name: PRE-REQUISITOS
-  include_tasks: install_dependencias_debian.yml
-  when: ansible_os_family == "Debian"
+# - name: PRE-REQUISITOS
+#   include_tasks: install_dependencias_debian.yml
+#   when: ansible_os_family == "Debian"
 
-- name: PRE-REQUISITOS
-  include_tasks: install_dependencias_redhat.yml
-  when: ansible_os_family == "RedHat"
+# - name: PRE-REQUISITOS
+#   include_tasks: install_dependencias_redhat.yml
+#   when: ansible_os_family == "RedHat"
 
 - name: INSTALACION ELK
   include_tasks: install_elk_debian.yml
