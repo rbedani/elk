@@ -4,14 +4,14 @@
       - elasticsearch
   become: yes
 
-- name: Instalando Logstash
-  apt:
-    name:
-      - logstash
-  become: yes
-
 - name: Instalando Kibana
   apt:
     name:
       - kibana
+  become: yes
+
+- name: Instalando Logstash
+  apt:
+    name:
+      - logstash
   become: yes
