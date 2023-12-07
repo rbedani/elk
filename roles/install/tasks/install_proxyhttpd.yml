@@ -4,12 +4,14 @@
       - httpd
       - mod_ssl
     state: present
+  become: yes
 
 - name: Configurar Apache como proxy HTTP para Kibana
   template:
     src: templates/proxyhttpd.conf.j2
     dest: /etc/httpd/conf.d/kibana.conf
     mode: 0644
+  become: yes
 
 - name: Habilitar tráfico HTTP en el firewall
   firewalld:
@@ -17,15 +19,18 @@
     permanent: true
     state: enabled
     immediate: true
+  become: yes
 
 - name: Configurar permisos de SELinux
   seboolean:
     name: httpd_can_network_connect
     state: yes
     persistent: true
+  become: yes
 
 - name: Reiniciar Apache
   service:
     name: httpd
     state: restarted
     enabled: yes
+  become: yes

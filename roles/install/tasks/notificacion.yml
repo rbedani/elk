@@ -3,6 +3,7 @@
   shell: /usr/share/elasticsearch/bin/elasticsearch-create-enrollment-token -s kibana
   register: kibana_token
   when: version == "8" or version == "7"
+  become: yes
 - set_fact:
     new_token: "{{ kibana_token.stdout_lines[-1] | regex_replace('^.*: ', '') }}"
   when: version == "8" or version == "7"
@@ -18,6 +19,7 @@
       '.*?Please confirm that you would like to continue.*?': 'y'
   register: consola
   when: version == "8"
+  become: yes
 - set_fact:
     new_password_kibana_system: "{{ consola.stdout_lines[-1] | regex_replace('^.*: ', '') }}"
   when: version == "8"
@@ -30,6 +32,7 @@
   shell: /usr/share/kibana/bin/kibana-verification-code
   register: kibana_code
   when: version == "8"
+  become: yes
 - set_fact:
     new_code: "{{ kibana_code.stdout_lines }}"
   when: version == "8"
@@ -45,6 +48,7 @@
       '.*?Please confirm that you would like to continue.*?': 'y'
   register: consola
   when: version == "8"
+  become: yes
 - set_fact:
     new_password_elastic: "{{ consola.stdout_lines[-1] | regex_replace('^.*: ', '') }}"
   when: version == "8"

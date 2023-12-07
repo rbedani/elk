@@ -8,6 +8,7 @@
     insertafter: EOF
     state: present
   when: version == "7"
+  become: yes
 
 - name: Configurar Kibana 8
   lineinfile:
@@ -16,5 +17,6 @@
     insertafter: EOF
     state: present
   when: version == "8"
+  become: yes
 
 ### IMPORTAR CONFIGURACION LOGSTASH

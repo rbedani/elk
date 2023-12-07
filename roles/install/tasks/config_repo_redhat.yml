@@ -14,6 +14,7 @@
     gpgcheck: no
     enabled: yes
   when: version == "8"
+  become: yes
 
 - name: Elasticsearch repository for 7.x packages
   yum_repository:
@@ -23,6 +24,7 @@
     gpgcheck: no
     enabled: yes
   when: version == "7"
+  become: yes
 
 - name: Elasticsearch repository for 6.x packages
   yum_repository:
@@ -32,3 +34,4 @@
     gpgcheck: no
     enabled: yes
   when: version == "6"
+  become: yes

@@ -1,9 +1,11 @@
 - name: Actualizar lista de paquetes
   apt:
     update_cache: yes
+  become: yes
 
 - name: Instalar dependencias
   apt:
     name:
       - default-jdk
       #- python3-pip
+  become: yes

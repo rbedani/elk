@@ -2,13 +2,16 @@
   yum:
     name:
       - elasticsearch
+  become: yes
 
 - name: Instalando Logstash
   yum:
     name:
       - logstash
+  become: yes
 
 - name: Instalando Kibana
   yum:
     name:
       - kibana
+  become: yes

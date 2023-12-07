@@ -3,6 +3,7 @@
     name: '*'
     state: latest
     update_cache: yes
+  become: yes
 
 - name: Instalar dependencias
   yum:
@@ -10,9 +11,11 @@
       - java-11-openjdk-devel
       - python3-pip
     state: present
+  become: yes
 
 - name: pip Install
   pip:
     name:
       - pexpect
     state: present
+  become: yes

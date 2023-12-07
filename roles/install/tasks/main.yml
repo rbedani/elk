@@ -1,56 +1,44 @@
 ---
 - name: REPOSITORIOS
   include_tasks: config_repo_debian.yml
-  become: yes
   when: ansible_os_family == "Debian"
 
 - name: REPOSITORIOS
   include_tasks: config_repo_redhat.yml
-  become: yes
   when: ansible_os_family == "RedHat"
 
 - name: PRE-REQUISITOS
   include_tasks: install_dependencias_debian.yml
-  become: yes
   when: ansible_os_family == "Debian"
 
 - name: PRE-REQUISITOS
   include_tasks: install_dependencias_redhat.yml
-  become: yes
   when: ansible_os_family == "RedHat"
 
 - name: INSTALACION ELK
   include_tasks: install_elk_debian.yml
-  become: yes
   when: ansible_os_family == "Debian"
 
 - name: INSTALACION ELK
   include_tasks: install_elk_redhat.yml
-  become: yes
   when: ansible_os_family == "RedHat"
 
 - name: IMPORTAR CONFIGURACION ELK
   include_tasks: import_config_elk.yml
-  become: yes
   
 - name: RESTART ELK
   include_tasks: reload_services.yml
-  become: yes
   
 - name: PROXY NGINX
   include_tasks: install_proxynginx.yml
-  become: yes
   when: ansible_os_family == "Debian"
 
 - name: PROXY HTTPD
   include_tasks: install_proxyhttpd.yml
-  become: yes
   when: ansible_os_family == "RedHat"
   
 - name: NOTIFICACION
   include_tasks: notificacion.yml
-  become: yes
 
 #- name: LICENSE
 #  include_tasks: import_license.yml
-#  become: yes

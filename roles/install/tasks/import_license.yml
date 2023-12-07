@@ -5,6 +5,7 @@
     mode: 0660
     group: elasticsearch
   when: version == "6"
+  become: yes
 
 #- name: Apply license by shell
 #  shell: /usr/shared/elasticsearch/bin/elasticsearch-license --in /usr/shared/elasticsearch/license_ver_6.json"
@@ -23,6 +24,7 @@
     force_basic_auth: yes
   register: resultado
   when: version == "6"
+  become: yes
 
 - name: Verificar resultado
   debug:
